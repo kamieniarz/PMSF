@@ -124,6 +124,7 @@ module.exports = function (grunt) {
                     'static/dist/data/conditiontype.min.json': 'static/data/conditiontype.json',
                     'static/dist/data/items.min.json': 'static/data/items.json',
                     'static/dist/data/grunttype.min.json': 'static/data/grunttype.json',
+                    'static/dist/data/raidegg.min.json': 'static/data/raidegg.json',
                     'static/dist/data/searchmarkerstyle.min.json': 'static/data/searchmarkerstyle.json',
                     'static/dist/data/weather.min.json': 'static/data/weather.json',
                     'static/dist/locales/de.min.json': 'static/locales/de.json',
@@ -137,7 +138,8 @@ module.exports = function (grunt) {
                     'static/dist/locales/sp.min.json': 'static/locales/sp.json',
                     'static/dist/locales/zh_cn.min.json': 'static/locales/zh_cn.json',
                     'static/dist/locales/zh_tw.min.json': 'static/locales/zh_tw.json',
-                    'static/dist/locales/zh_hk.min.json': 'static/locales/zh_hk.json'
+                    'static/dist/locales/zh_hk.min.json': 'static/locales/zh_hk.json',
+                    'static/dist/locales/sv.min.json': 'static/locales/sv.json'
                 }
             }
         },

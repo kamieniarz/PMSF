@@ -6,7 +6,7 @@
 
 //======================================================================
 // PMSF - DEFAULT CONFIG FILE
-// https://github.com/whitewillem/PMSF
+// https://github.com/pmsf/PMSF
 //======================================================================
 if (!isset($_SESSION)) {
     session_start();
@@ -17,7 +17,6 @@ $libs[] = "Scanner.php";
 $libs[] = "Monocle.php";
 $libs[] = "Monocle_PMSF.php";
 $libs[] = "RDM.php";
-$libs[] = "RDM_beta.php";
 $libs[] = "RocketMap.php";
 $libs[] = "RocketMap_MAD.php";
 $libs[] = "search/Search.php";
@@ -50,7 +49,7 @@ $startingLng = 5.302366;                                        // Starting long
 $maxLatLng = 1;                                                     // Max latitude and longitude size (1 = ~110km, 0 to disable)
 $defaultZoom = 16;                                                  // Default zoom level for first time users.
 $maxZoomOut = 0;                                                    // Max zoom out level (11 ~= $maxLatLng = 1, 0 to disable, lower = the further you can zoom out)
-$maxZoomIn = 18;                                                    // Max zoom in level 18
+$maxZoomIn = 18;                                                    // Max zoom in level 18, higher values will be loaded from level 18 and auto-scaled
 $disableClusteringAtZoom = 15;					                    // Disable clustering above this value. 0 to disable
 $zoomToBoundsOnClick = 15;					                        // Zoomlevel on clusterClick
 $maxClusterRadius = 30;						                        // The maximum radius that a cluster will cover from the central marker (in pixels).
@@ -79,7 +78,7 @@ $blockIframe = true;                                                // Block you
 $title = "PMSF Alt";                                                // Title to display in title bar
 $headerTitle = "POGOmap";                                           // Title to display in header
 $locale = "en";                                                     // Display language
-
+$noLocaleSelection = false;
 /* Loading screen */
 
 $noLoadingScreen = false;                                           // show loading animation while main page loads.
@@ -96,9 +95,14 @@ $noCustomTileServer = true;                                         // Enable/Di
 $customTileServerAddress = "";                                      // TileServer URL: http://ipAddress:port/tile/klokantech-basic/{z}/{x}/{y}/1/png
 $forcedTileServer = false;
 
+/* Favicon */
+$faviconPath = '';                                                  // Upload favicon.ico to custom folder, leave '' for empty ( $faviconPath = 'custom/favicon.ico'; )
+$appIconPath = 'static/appicons/';
+
 /* Custom Overlay */
 $letItSnow = true;                                                   // Show snow overlay at 24, 25 and 26 December
 $makeItBang = true;                                                  // Show fireworks overlay at 31 December and 1 January
+$showYourLove = true;
 
 /* Google Analytics */
 
@@ -141,8 +145,12 @@ $imgurCID = "";
 
 /* Counts */
 $numberOfPokemon = 649;
-$numberOfItem = 1405;
+$numberOfItem = 1600;
 $numberOfGrunt = 50;
+$numberOfEgg = 12;
+
+/* UserTimezone */
+$userTimezone = date_default_timezone_get();
 //-----------------------------------------------------
 // Login  - You need to create the two tables referenced in sql.sql
 //-----------------------------------------------------
@@ -179,6 +187,7 @@ $noExcludeMinIV = true;                                        // true/false
 $noMinIV = true;                                               // true/false
 $noMinLevel = true;                                            // true/false
 $noHighLevelData = true;                                       // true/false
+$noCatchRates = false;
 $noRarityDisplay = false;                                      // true/false
 $noWeatherIcons = true;
 $no100IvShadow = false;
@@ -203,11 +212,10 @@ $noPokemon = false;                                                 // true/fals
 $enablePokemon = 'true';                                            // true/false
 $noPokemonNumbers = false;                                          // true/false
 $noHidePokemon = false;                                             // true/false
-$hidePokemon = '[10, 13, 16, 19, 21, 29, 32, 41, 46, 48, 50, 52, 56, 74, 77, 96, 111, 133,
-                  161, 163, 167, 177, 183, 191, 194, 168]';         // [] for empty
+$hidePokemon = '[]';                                                // [] for empty
 $hidePokemonCoords = false;                                         // true/false
 
-$excludeMinIV = '[131, 143, 147, 148, 149, 248]';                   // [] for empty
+$excludeMinIV = '[]';                                               // [] for empty
 
 $minIV = '0';                                                       // "0" for empty or a number
 $minLevel = '0';                                                    // "0" for empty or a number
@@ -220,14 +228,27 @@ $enableGyms = 'false';                                              // true/fals
 $hideGymCoords = false;
 $noExEligible = false;                                              // true/false
 $exEligible = 'false';                                              // true/false
+$noTeams = false;
+$noOpenSpot = false;
+$noMinMaxFreeSlots = false;
+$noLastScan = false;
 
 $noRaids = false;                                                   // true/false
 $enableRaids = 'false';                                             // true/false
+$noActiveRaids = true;
 $activeRaids = 'false';                                             // true/false
+$noMinMaxRaidLevel = true;
 $minRaidLevel = 1;
-$maxRaidLevel = 5;
+$maxRaidLevel = 6;
 $noRaidTimer = false;                                               // true/false
 $enableRaidTimer = 'false';                                         // true/false
+$noRaidbossNumbers = false;
+$hideRaidboss = '[]';
+$excludeRaidboss = [];
+$noRaideggNumbers = false;
+$hideRaidegg = '[]';
+$excludeRaidegg = [];
+$generateExcludeRaidboss = true;
 
 $noPokestops = false;                                               // true/false
 $enablePokestops = 'false';                                         // true/false
@@ -260,7 +281,7 @@ $excludeQuestsPokemon = [];  // Pokemon ids
 $hideQuestsItem = '[4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 708, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1403, 1404, 1405]';    // Item ids "See protos https://github.com/Furtif/POGOProtos/blob/master/src/POGOProtos/Inventory/Item/ItemId.proto"
 $excludeQuestsItem = [4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 708, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1403, 1404, 1405];
 $noItemNumbers = true;                                             // true/false
-
+$defaultDustAmount = 500;
 // Manual quest hide options
 $hideQuestTypes = [0, 1, 2, 3, 12, 18, 19, 22, 24, 25];
 $hideRewardTypes = [0, 1, 4, 5, 6];
@@ -303,7 +324,7 @@ $enableSpawnArea = 'false';                                         // true/fals
 
 /* Notification Settings */
 
-$notifyPokemon = '[]';                                           // [] for empty
+$notifyPokemon = '[]';                                              // [] for empty
 $notifyRarity = '[]';                                               // "Common", "Uncommon", "Rare", "Very Rare", "Ultra Rare"
 $notifyIv = '""';                                                   // "" for empty or a number
 $notifyLevel = '""';                                                // "" for empty or a number
@@ -314,6 +335,7 @@ $notifyBounce = 'true';                                             // true/fals
 $notifyNotification = 'true';                                       // true/false
 
 /* Style Settings */
+$noDarkMode = false;
 
 $copyrightSafe = true;
 $noCostumeIcons = true;                                            // Set to true if you $iconRepository doesnt support costume icons. true/false
@@ -322,7 +344,7 @@ $noMultipleRepos = true;
 $iconRepos = [["Standard","$iconRepository"]];
 
 $noMapStyle = false;                                                // true/false
-$mapStyle = 'openstreetmap';                                        // openstreetmap, darkmatter, styleblackandwhite, styletopo, stylesatellite, stylewikipedia
+$mapStyle = 'openstreetmap';                                        // openstreetmap, darkmatter, styleblackandwhite, styletopo, stylesatellite
 
 $noDirectionProvider = false;                                       // true/false
 $directionProvider = 'google';                                      // google, waze, apple, bing, google_pin
@@ -361,7 +383,7 @@ $noManualQuests = true;
 // Ingress portals
 //-----------------------------------------------------
 $enablePortals = 'false';
-$enableNewPortals = 0;                                                   // O: all, 1: new portals only
+$enableNewPortals = 0;                                             // O: all, 1: new portals only
 $noPortals = true;
 $noDeletePortal = true;
 $noConvertPortal = true;
@@ -445,6 +467,9 @@ $noEditCommunity = true;
 // Nests
 //-----------------------------------------------------
 $noNests = true;                                                   // true/false
+$noNestsAvg = true;                                                   // true/false
+$nestAvgMax = 50;
+$nestAvgDefault = 5;
 $enableNests = 'false';                                             // true/false
 $hideNestCoords = false;
 $noManualNests = true;
@@ -468,7 +493,7 @@ $areas = [];                                                        // [[latitud
 //-----------------------------------------------------
 // Weather Config
 //-----------------------------------------------------
-
+$noHeaderWeatherIcon = true;
 $noWeatherOverlay = true;                                          // true/false
 $enableWeatherOverlay = 'false';                                    // true/false
 

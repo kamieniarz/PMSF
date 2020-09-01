@@ -10,7 +10,7 @@ use Medoo\Medoo;
 
 //======================================================================
 // PMSF - CONFIG FILE
-// https://github.com/whitewillem/PMSF
+// https://github.com/pmsf/PMSF
 //======================================================================
 
 //-----------------------------------------------------
@@ -27,7 +27,7 @@ $startingLng = 5.302366;                                           // Starting l
 $maxLatLng = 1;                                                     // Max latitude and longitude size (1 = ~110km, 0 to disable)
 $defaultZoom = 16;                                                  // Default zoom level for first time users.
 $maxZoomOut = 11;                                                   // Max zoom out level (11 ~= $maxLatLng = 1, 0 to disable, lower = the further you can zoom out)
-$maxZoomIn = 18;                                                    // Max zoom in level 18
+$maxZoomIn = 18;                                                    // Max zoom in level 18, higher values will be loaded from level 18 and auto-scaled
 $disableClusteringAtZoom = 15;                                      // Disable clustering above this value. 0 to disable
 $zoomToBoundsOnClick = 15;                                          // Zoomlevel on clusterClick
 $maxClusterRadius = 30;                                             // The maximum radius that a cluster will cover from the central marker (in pixels).
@@ -56,6 +56,7 @@ $blockIframe = true;                                                // Block you
 $title = "POGOmap";                                                 // Title to display in title bar
 $headerTitle = "POGOmap";                                           // Title to display in header
 $locale = "en";                                                     // Display language
+$noLocaleSelection = false;
 $raidmapLogo = '';                                                  // Upload logo to custom folder, leave '' for empty ( $raidmapLogo = 'custom/logo.png'; )
 
 /* Loading screen */
@@ -120,14 +121,13 @@ $motdContent = "This is an example MOTD<br>Do whatever you like with it.";
 
 /* Favicon */
 $faviconPath = '';                                                  // Upload favicon.ico to custom folder, leave '' for empty ( $faviconPath = 'custom/favicon.ico'; )
+$appIconPath = 'static/appicons/';
 
 /* IMGBB API */
 $imgurCID = "";
 
-/* Counts */
-$numberOfPokemon = 649;
-$numberOfItem = 1405;
-$numberOfGrunt = 50;
+/* UserTimezone */
+#$userTimezone = "Etc/UTC";			                    // If different from server settings set php frontend timezone https://www.php.net/manual/en/timezones.php
 //-----------------------------------------------------
 // Login
 //-----------------------------------------------------
@@ -157,12 +157,14 @@ $domainName = '';                                                   // If this i
 //-----------------------------------------------------
 // FRONTEND SETTINGS
 //-----------------------------------------------------
+$noDarkMode = false;
 
 /* Marker Settings */
 $noExcludeMinIV = false;
 $noMinIV = false;
 $noMinLevel = false;
 $noHighLevelData = false;
+$noCatchRates = false;
 $noRarityDisplay = false;
 $noWeatherIcons = true;
 $no100IvShadow = false;
@@ -197,20 +199,44 @@ $minLevel = '0';                                                    // "0" for e
 $noBigKarp = false;
 $noTinyRat = false;
 
+/* Gyms */
 $noGyms = false;
 $enableGyms = 'false';
+
 $hideGymCoords = false;
+
 $noExEligible = false;
 $exEligible = 'false';
 
+$noTeams = false;
+$noOpenSpot = false;
+$noMinMaxFreeSlots = false;
+$noLastScan = false;
+
+/* Raids */
 $noRaids = false;
 $enableRaids = 'false';
+
+$noActiveRaids = true;
 $activeRaids = 'false';
+
+$noMinMaxRaidLevel = true;
 $minRaidLevel = 1;
 $maxRaidLevel = 5;
+
 $noRaidTimer = false;
 $enableRaidTimer = 'false';
 
+$noRaidbossNumbers = false;
+$hideRaidboss = '[]';
+$excludeRaidboss = [];
+$generateExcludeRaidboss = true;
+
+$noRaideggNumbers = false;
+$hideRaidegg = '[]';
+$excludeRaidegg = [];
+
+/* Pokestops */
 $noPokestops = false;
 $enablePokestops = 'false';
 $hidePokestopCoords = false;
@@ -243,7 +269,7 @@ $excludeQuestsPokemon = [];					                        // All Pokémon in this 
 $hideQuestsItem = '[4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 707, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1402, 1403, 1404, 1405]';    // Item ids "See protos https://github.com/Furtif/POGOProtos/blob/master/src/POGOProtos/Inventory/Item/ItemId.proto"
 $excludeQuestsItem = [4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 707, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1402, 1403, 1404, 1405];   // All excluded item wil not be shown in the filter.
 $noItemNumbers = false;
-
+$defaultDustAmount = 500;
 // Manual quest hide options
 $hideQuestTypes = [0, 1, 2, 3, 12, 18, 19, 22, 24, 25];
 $hideRewardTypes = [0, 1, 4, 5, 6];
@@ -267,7 +293,7 @@ $enableLiveScan = 'false';
 $hideDeviceAfterMinutes = 0;                                        // Hide scan devices from map after x amount of minutes not being updated in database. 0 to disable.
 $deviceOfflineAfterSeconds = 300;                                   // Mark scan devices offline (red color) after x amount of seconds not being updated in database.
 
-$hideDeleted = true;						// Hide deleted Pokestop / Gyms from map
+$hideDeleted = true;                                                // Hide deleted Pokestop / Gyms from map
 /* Location & Search Settings */
 
 $noSearchLocation = false;
@@ -294,7 +320,7 @@ $notifyIv = '""';                                                   // "" for em
 
 $notifyLevel = '""';                                                // "" for empty or a number
 
-$notifyRaid = 5;                                                    // 1,2,3,4 or 5, 0 to disable
+$notifyRaid = 6;                                                    // 1,2,3,4 or 5, 0 to disable
 
 $notifySound = 'false';
 
@@ -318,7 +344,7 @@ $iconRepos = [["Standard","$iconRepository"],                                   
               ["Another Iconpack","https://AnotherURL.com/some/other/subfolders/"]]; // You May add different iconPacks here so mapusers can switch between them
 
 $noMapStyle = false;
-$mapStyle = 'openstreetmap';                                        // openstreetmap, darkmatter, styleblackandwhite, styletopo, stylesatellite, stylewikipedia
+$mapStyle = 'openstreetmap';                                        // openstreetmap, darkmatter, styleblackandwhite, styletopo, stylesatellite
 
 $noDirectionProvider = false;
 $directionProvider = 'google';                                      // google, waze, apple, bing, google_pin
@@ -449,6 +475,9 @@ $noEditCommunity = true;
 // Nests
 //-----------------------------------------------------
 $noNests = true;
+$noNestsAvg = true;                                                   // true/false
+$nestAvgMax = 50;						      // Nest Average filter maximum
+$nestAvgDefault = 5;                                                  // Nest Average filter default
 $enableNests = 'false';
 $hideNestCoords = false;
 $noManualNests = true;
@@ -471,6 +500,7 @@ $areas = [];      // [[latitude,longitude,zoom,"name"],[latitude,longitude,zoom,
 //-----------------------------------------------------
 // Weather Config
 //-----------------------------------------------------
+$noHeaderWeatherIcon = true;
 $noWeatherOverlay = true;
 $enableWeatherOverlay = 'false';
 
@@ -491,6 +521,7 @@ $weatherColors = [
 //-----------------------------------------------------
 $letItSnow = true;                                                   // Show snow overlay at 24, 25 and 26 December
 $makeItBang = true;                                                  // Show fireworks overlay at 31 December and 1 January
+$showYourLove = true;                                                // Show valentine overlay at 14 februari
 
 //-----------------------------------------------------
 // DEBUGGING
@@ -501,35 +532,27 @@ $enableDebug = false;
 //-----------------------------------------------------
 // DATABASE CONFIG
 //-----------------------------------------------------
-$map = "rdm";                                                       // {monocle}/{rdm}/{rocketmap}
-$fork = "default";                                                  // {default/alternate}/{default/beta}/{mad}
-$queryInterval = '2500';                                            // Interval between raw_data requests. Try to lower to increase performance.
+$map = "rdm";                                                       // rdm / rocketmap
+$fork = "default";                                                  // beta / mad
+$queryInterval = '2500';                                            // Interval between raw_data requests.
 
-$db = new Medoo([// required
+$db = new Medoo([
     'database_type' => 'mysql',
-    'database_name' => 'Monocle',
+    'database_name' => 'scannerdb',
     'server' => '127.0.0.1',
     'username' => 'database_user',
     'password' => 'database_password',
-    'charset' => 'utf8',
-
-    // [optional]
-    //'port' => 5432,                                               // Comment out if not needed, just add // in front!
-    //'socket' => /path/to/socket/,
+    'charset' => 'utf8'
 ]);
 
-//$manualdb = new Medoo([// required
+//$manualdb = new Medoo([
 //    'database_type' => 'mysql',
-//    'database_name' => 'Monocle',
+//    'database_name' => 'manualdb',
 //    'server' => '127.0.0.1',
 //    'username' => 'database_user',
 //    'password' => 'database_password',
-//    'charset' => 'utf8mb4',
-
-    // [optional]
-    //'port' => 5432,                                               // Comment out if not needed, just add // in front!
-    //'socket' => /path/to/socket/,
-//]);                                                               // Dont forget to uncomment this line to use $manualdb :)
+//    'charset' => 'utf8mb4'
+//]);
 
 // DONT EDIT THE CODE BELOW
 if (($noNativeLogin === false || $noDiscordLogin === false) && !empty($_SESSION['user']->user)) {

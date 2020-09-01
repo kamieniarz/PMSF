@@ -23,8 +23,10 @@ $oNeLat = !empty($_POST['oNeLat']) ? $_POST['oNeLat'] : 0;
 $oNeLng = !empty($_POST['oNeLng']) ? $_POST['oNeLng'] : 0;
 $lures = !empty($_POST['lures']) ? $_POST['lures'] : false;
 $rocket = !empty($_POST['rocket']) ? $_POST['rocket'] : false;
+$raids = !empty($_POST['raids']) ? $_POST['raids'] : false;
 $quests = !empty($_POST['quests']) ? $_POST['quests'] : false;
 $dustamount = isset($_POST['dustamount']) ? $_POST['dustamount'] : false;
+$nestavg = isset($_POST['nestavg']) ? $_POST['nestavg'] : false;
 $reloaddustamount = !empty($_POST['reloaddustamount']) ? $_POST['reloaddustamount'] : false;
 $newportals = !empty($_POST['newportals']) ? $_POST['newportals'] : 0;
 $minIv = isset($_POST['minIV']) ? floatval($_POST['minIV']) : false;
@@ -78,10 +80,11 @@ if (!validateToken($_POST['token'])) {
 
 if ((! $noDiscordLogin || ! $noNativeLogin) && !empty($_SESSION['user']->id)) {
     $info = $manualdb->query("SELECT session_id FROM users WHERE id = :id", [":id" => $_SESSION['user']->id])->fetch();
-    if ($info['session_id'] !== $_COOKIE["LoginCookie"]) {
+    if (empty($_COOKIE["LoginCookie"]) || $info['session_id'] !== $_COOKIE["LoginCookie"]) {
         http_response_code(400);
         die();
     }
+    $debug['0_after_auth'] = microtime(true) - $timing['start'];
 }
 
 // init map
@@ -92,10 +95,8 @@ if (strtolower($map) === "monocle") {
         $scanner = new \Scanner\Monocle_PMSF();
     }
 } elseif (strtolower($map) === "rdm") {
-    if (strtolower($fork) === "default") {
+    if (strtolower($fork) === "default" || strtolower($fork) === "beta") {
         $scanner = new \Scanner\RDM();
-    } else {
-        $scanner = new \Scanner\RDM_beta();
     }
 } elseif (strtolower($map) === "rocketmap") {
     if (strtolower($fork) === "mad") {
@@ -128,6 +129,10 @@ $qieids = array();
 $qireids = array();
 $geids = array();
 $greids = array();
+$rbeids = array();
+$rbreids = array();
+$reeids = array();
+$rereids = array();
 
 $debug['1_before_functions'] = microtime(true) - $timing['start'];
 
@@ -175,7 +180,7 @@ if (!$noPokestops) {
                 $d["pokestops"] = $scanner->get_stops($geids, $qpeids, $qieids, $swLat, $swLng, $neLat, $neLng, $timestamp, 0, 0, 0, 0, $lures, $rocket, $quests, $dustamount);
             }
         }
-        if ((strtolower($map) === "rdm" && strtolower($fork) === "beta") || (strtolower($map) === "rocketmap" && strtolower($fork) === "mad")) {
+        if ((strtolower($map) === "rdm") || (strtolower($map) === "rocketmap" && strtolower($fork) === "mad")) {
             if ($reloaddustamount == "true") {
                 $d["pokestops"] = array_merge($d["pokestops"], $scanner->get_stops_quest($greids, $qpreids, $qireids, $swLat, $swLng, $neLat, $neLng, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng, $lures, $rocket, $quests, $dustamount, $reloaddustamount));
             }
@@ -216,15 +221,34 @@ $debug['3_after_pokestops'] = microtime(true) - $timing['start'];
 
 global $noGyms, $noRaids;
 if (!$noGyms || !$noRaids) {
-    if ($d["lastgyms"] == "true") {
+    if ($d["lastgyms"] == "true" || $raids == "true") {
+        $gyms = $d["lastgyms"];
+        $rbeids = !empty($_POST['rbeids']) ? explode(",", $_POST['rbeids']) : array();
+        $reeids = !empty($_POST['reeids']) ? explode(",", $_POST['reeids']) : array();
         if ($lastgyms != "true") {
-            $d["gyms"] = $scanner->get_gyms($swLat, $swLng, $neLat, $neLng, $exEligible);
+            $d["gyms"] = $scanner->get_gyms($rbeids, $reeids, $swLat, $swLng, $neLat, $neLng, $exEligible, 0, 0, 0, 0, 0, $raids, $gyms);
         } else {
             if ($newarea) {
-                $d["gyms"] = $scanner->get_gyms($swLat, $swLng, $neLat, $neLng, $exEligible, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng);
+                $d["gyms"] = $scanner->get_gyms($rbeids, $reeids, $swLat, $swLng, $neLat, $neLng, $exEligible, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng, $raids, $gyms);
             } else {
-                $d["gyms"] = $scanner->get_gyms($swLat, $swLng, $neLat, $neLng, $exEligible, $timestamp);
+                $d["gyms"] = $scanner->get_gyms($rbeids, $reeids, $swLat, $swLng, $neLat, $neLng, $exEligible, $timestamp, 0, 0, 0, 0, $raids, $gyms);
             }
+        }
+        if (!empty($_POST['rbreids'])) {
+            $rbreids = !empty($_POST['rbreids']) ? array_unique(explode(",", $_POST['rbreids'])) : array();
+            $rbreidsDiff = array_diff($rbreids, $rbeids);
+            if (count($rbreidsDiff)) {
+                $d["gyms"] = array_merge($d["gyms"], $scanner->get_gyms($rbeids, $reeids, $swLat, $swLng, $neLat, $neLng, $exEligible, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng, $raids, $gyms));
+            }
+            $d["rbreids"] = $rbreids;
+        }
+        if (!empty($_POST['rereids'])) {
+            $rereids = !empty($_POST['rereids']) ? array_unique(explode(",", $_POST['rereids'])) : array();
+            $rereidsDiff = array_diff($rereids, $reeids);
+            if (count($rereidsDiff)) {
+                $d["gyms"] = array_merge($d["gyms"], $scanner->get_gyms($rbeids, $reeids, $swLat, $swLng, $neLat, $neLng, $exEligible, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng, $raids, $gyms));
+            }
+            $d["rereids"] = $rereids;
         }
     }
 }
@@ -234,16 +258,17 @@ global $noNests;
 if (!$noNests) {
     if ($d["lastnests"] == "true") {
         if ($lastnests != "true") {
-            $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng);
+            $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng, 0, 0, 0, 0, 0, $nestavg);
         } else {
             if ($newarea) {
-                $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng);
+                $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng, 0, $oSwLat, $oSwLng, $oNeLat, $oNeLng, $nestavg);
             } else {
-                $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng, time());
+                $d["nests"] = $manual->get_nests($swLat, $swLng, $neLat, $neLng, time(), 0, 0, 0, 0, $nestavg);
             }
         }
     }
 }
+$debug['5_after_nest'] = microtime(true) - $timing['start'];
 
 global $noCommunity;
 if (!$noCommunity) {
@@ -259,6 +284,7 @@ if (!$noCommunity) {
         }
     }
 }
+$debug['6_after_community'] = microtime(true) - $timing['start'];
 
 global $noPortals;
 if (!$noPortals) {
@@ -274,6 +300,7 @@ if (!$noPortals) {
         }
     }
 }
+$debug['7_after_portals'] = microtime(true) - $timing['start'];
 
 global $noPoi;
 if (!$noPoi) {
@@ -289,6 +316,7 @@ if (!$noPoi) {
         }
     }
 }
+$debug['8_after_poi'] = microtime(true) - $timing['start'];
 
 global $noSpawnPoints;
 if (!$noSpawnPoints) {
@@ -304,7 +332,7 @@ if (!$noSpawnPoints) {
         }
     }
 }
-$debug['5_after_spawnpoints'] = microtime(true) - $timing['start'];
+$debug['9_after_spawnpoints'] = microtime(true) - $timing['start'];
 
 global $noLiveScanLocation;
 if (!$noLiveScanLocation) {
@@ -316,9 +344,10 @@ if (!$noLiveScanLocation) {
         }
     }
 }
+$debug['10_after_devices'] = microtime(true) - $timing['start'];
 
 $d['token'] = refreshCsrfToken();
-$debug['6_end'] = microtime(true) - $timing['start'];
+$debug['11_end'] = microtime(true) - $timing['start'];
 
 if ($enableDebug == true) {
     foreach ($debug as $k => $v) {
