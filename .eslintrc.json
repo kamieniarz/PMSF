@@ -46,6 +46,8 @@
     "locationSet": true,
     "zoom": true,
     "encounterId": true,
+    "stopId": true,
+    "gymId": true,
     "defaultZoom": true,
     "minZoom": true,
     "maxZoom": true,
@@ -168,6 +170,7 @@
     "noIvShadow": true,
     "hideQuestsPokemon": true,
     "hideQuestsItem": true,
+    "hideQuestsEnergy": true,
     "noQuests": true,
     "noLures": true,
     "noTeamRocket": true,
@@ -205,12 +208,19 @@
     "noRaids": true,
     "letItSnow": true,
     "makeItBang": true,
+    "showYourLove": true,
     "noActiveRaids": true,
     "noMinMaxRaidLevel": true,
     "noTeams": true,
     "noOpenSpot": true,
     "noMinMaxFreeSlots": true,
     "noLastScan": true,
-    "noDarkMode": true
+    "noDarkMode": true,
+    "defaultDustAmount": true,
+    "noCatchRates": true,
+    "nestAvgDefault": true,
+    "noHideSingleMarker": true,
+    "noNestPolygon": true,
+    "nestBotName": true
   }
 }

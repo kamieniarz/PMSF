@@ -30,7 +30,7 @@ class Manual
         $json_contents = file_get_contents($json_moves);
         $this->moves = json_decode($json_contents, true);
     }
-    public function get_nests($swLat, $swLng, $neLat, $neLng, $tstamp = 0, $oSwLat = 0, $oSwLng = 0, $oNeLat = 0, $oNeLng = 0)
+    public function get_nests($swLat, $swLng, $neLat, $neLng, $tstamp = 0, $oSwLat = 0, $oSwLng = 0, $oNeLat = 0, $oNeLng = 0, $nestavg)
     {
         $conds = array();
         $params = array();
@@ -53,6 +53,10 @@ class Manual
         if ($tstamp > 0) {
             $conds[] = "updated > :lastUpdated";
             $params[':lastUpdated'] = $tstamp;
+	}
+	if ($nestavg != 0) {
+            $conds[] = "pokemon_avg > :nestavg";
+	    $params[':nestavg'] = $nestavg;
         }
         return $this->query_nests($conds, $params);
     }
@@ -64,8 +68,13 @@ class Manual
         lat,
         lon,
         pokemon_id,
+        updated,
         pokemon_avg,
-        type
+        pokemon_count,
+        pokemon_form,
+        type,
+        nest_submitted_by,
+        polygon_path
         FROM nests
         WHERE :conditions";
         $query = str_replace(":conditions", join(" AND ", $conds), $query);
@@ -77,12 +86,16 @@ class Manual
             $nest["lon"] = floatval($nest["lon"]);
             $nest["type"] = intval($nest["type"]);
             $nest["pokemon_avg"] = floatval($nest["pokemon_avg"]);
+            $nest["pokemon_count"] = intval($nest["pokemon_count"]);
+            $nest["pokemon_form"] = intval($nest["pokemon_form"]);
+            $nest["updated"] = $nest["updated"] * 1000;
             if ($nest['pokemon_id'] > 0) {
                 $nest["pokemon_name"] = i8ln($this->data[$nest["pokemon_id"]]['name']);
                 $types = $this->data[$nest["pokemon_id"]]["types"];
                 $etypes = $this->data[$nest["pokemon_id"]]["types"];
                 foreach ($types as $k => $v) {
                     $types[$k]['type'] = i8ln($v['type']);
+                    $types[$k]['color'] = $v['color'];
                     $etypes[$k]['type'] = $v['type'];
                 }
                 $nest["pokemon_types"] = $types;

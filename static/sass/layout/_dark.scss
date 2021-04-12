@@ -219,4 +219,29 @@
     button.submitting-poi, button.submitting-pokestop, button.submitting-gym, button.submitting-nest {
         color: $text-color-dark !important;
     }
+    div#motd {
+        background-color: $background-color-dark !important;
+        color: $text-color-dark !important;
+        a {
+            color: #0078a8;
+        }
+    }
+    .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+        background-color: $background-color-dark !important;
+    }
+    .ui-dialog.raid-widget-popup.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+        background-color: black;
+    }
+    .editpoi-modal .ui-dialog-content .ui-widget-content {
+        background-color: $background-color-dark !important;
+    }
+    input#poi-name, input#poi-description, button.editpoiid, button.markpoiid, button.convertpoi, button.markpoi, input#community-name, input#community-description, input#community-invite {
+        color: $text-color-dark !important;
+    }
+    .ui-dialog.raid-widget-popup.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+        background-color: $background-color-dark !important;
+    }
+    input#gym-name, input#pokestop-name {
+        color: $text-color-dark !important;
+    }
 }
